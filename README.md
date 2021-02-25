@@ -11,32 +11,32 @@ This application is made of six components:
 Components like Monitoring API, User API, Product API and Backup-Order API are connected via RabbitMQ. Dependencies which are used in this project are Spring Cloud Starter Gateway, Spring Boot Starter AMQP, Spring Boot Starter Data MongoDB, Spring Boot Starter Data MongoDB Reactive, Spring Boot Starter Security, Spring Boot Starter Web, Spring Cloud Consul Discovery, Java JWT, Commons Lang 3, Javax Servlet API.
 
 Endpoints for the system when all the components are started are:
-| Method | Endpoint |
-| ------ | ------ |
-| GET | http://localhost:8010/api/user/find |
-| GET | http://localhost:8010/api/user/find/{username} |
-| GET | http://localhost:8010/api/monitoring/{id} |
-| GET | http://localhost:8010/api/monitoring |
-| GET | http://localhost:8010/api/order/{id} |
-| GET | http://localhost:8010/api/order |
-| GET | http://localhost:8010/api/product/find |
-| GET | http://localhost:8010/api/product/find/{id} |
-| GET | http://localhost:8010/api/product/search/{param} |
-| GET | http://localhost:8010/api/product/category |
-| GET | http://localhost:8010/api/product/category/{id} |
-| POST | http://localhost:8010/api/user/register |
-| POST | http://localhost:8010/api/user/login |
-| POST | http://localhost:8010/api/user/update |
-| POST | http://localhost:8010/api/user/resetPassword |
-| POST | http://localhost:8010/api/order |
-| POST | http://localhost:8010/api/product |
-| POST | http://localhost:8010/api/product/addproduct |
-| DELETE | http://localhost:8010/api/user/delete/{id} |
-| DELETE | http://localhost:8010/api/user/delete |
-| DELETE | http://localhost:8010/api/monitoring |
-| DELETE | http://localhost:8010/api/monitoring/{id} |
-| DELETE | http://localhost:8010/api/order/{id} |
-| DELETE | http://localhost:8010/api/product/{id} |
-| DELETE | http://localhost:8010/api/product/ |
-| DELETE | http://localhost:8010/api/product/category/{id} |
-| DELETE | http://localhost:8010/api/product/category/ |
+| Method | Endpoint | Component |
+| ------ | ------ | ------ |
+| GET | http://localhost:8010/api/user/find | user-api |
+| GET | http://localhost:8010/api/user/find/{username} | user-api |
+| GET | http://localhost:8010/api/monitoring/{id} | monitoring-api |
+| GET | http://localhost:8010/api/monitoring | monitoring-api |
+| GET | http://localhost:8010/api/order/{id} | order-backup-api |
+| GET | http://localhost:8010/api/order | order-backup-api |
+| GET | http://localhost:8010/api/product/find | product-api |
+| GET | http://localhost:8010/api/product/find/{id} | product-api |
+| GET | http://localhost:8010/api/product/search/{param} | product-api |
+| GET | http://localhost:8010/api/product/category | product-api |
+| GET | http://localhost:8010/api/product/category/{id} | product-api |
+| POST | http://localhost:8010/api/user/register | user-api |
+| POST | http://localhost:8010/api/user/login | user-api |
+| POST | http://localhost:8010/api/user/update | user-api |
+| POST | http://localhost:8010/api/user/resetPassword | user-api |
+| POST | http://localhost:8010/api/order | order-backup-api |
+| POST | http://localhost:8010/api/product | product-api |
+| POST | http://localhost:8010/api/product/addproduct | product-api |
+| DELETE | http://localhost:8010/api/user/delete/{id} | user-api |
+| DELETE | http://localhost:8010/api/user/delete | user-api |
+| DELETE | http://localhost:8010/api/monitoring | monitoring-api |
+| DELETE | http://localhost:8010/api/monitoring/{id} | monitoring-api |
+| DELETE | http://localhost:8010/api/order/{id} | order-backup-api |
+| DELETE | http://localhost:8010/api/product/{id} | product-api |
+| DELETE | http://localhost:8010/api/product/ | product-api |
+| DELETE | http://localhost:8010/api/product/category/{id} | product-api |
+| DELETE | http://localhost:8010/api/product/category/ | product-api |
