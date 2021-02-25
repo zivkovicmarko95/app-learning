@@ -39,7 +39,6 @@ public class RabbitmqConfig {
         return BindingBuilder.bind(queue).to(exchange).with(env.getProperty("rabbitmq.productapi.routingKey"));
     }
 
-    // Treba ga bind-ovati sa order-backup-api
     @Bean
     public Queue queueOrderBackupProductApi() {
         return new Queue(env.getProperty("rabbitmq.order_backup_api_product_api.queue"));

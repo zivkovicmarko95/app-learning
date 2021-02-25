@@ -39,8 +39,6 @@ public class RabbitmqConfig {
         return BindingBuilder.bind(queue).to(exchange).with(env.getProperty("rabbitmq.order_backup_api.routingKey"));
     }
 
-    // topic exchange
-
     @Bean
     public MessageConverter converter() {
         return new Jackson2JsonMessageConverter();
