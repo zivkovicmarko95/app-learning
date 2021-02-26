@@ -68,7 +68,7 @@ public class JwtTokenProvider {
     }
 
     public String getSubject(String token) {
-        if (StringUtils.isEmpty(token)) {
+        if (StringUtils.isBlank(token)) {
             return null;
         }
         
