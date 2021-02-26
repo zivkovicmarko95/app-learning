@@ -27,10 +27,18 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     @Autowired
     private JwtHelper jwtHelper;
 
+    private String[] public_urls = { "/actuator/health", "/api/user/login", "/api/user/register", 
+                                        "/api/user/resetpassword", "/api/product/search", "/api/product/find" };
+
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             final ServerHttpRequest request = exchange.getRequest();
+            final String urlPath = request.getURI().getPath();
+
+            if (isPublicUrl(urlPath)) {
+                return chain.filter(exchange);
+            }
 
             if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
                 return onError(exchange, "No authorization header", HttpStatus.UNAUTHORIZED);
@@ -50,6 +58,16 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(httpStatus);
         return response.setComplete();
+    }
+
+    private boolean isPublicUrl(String url) {
+        for (int i = 0; i < public_urls.length; i++) {
+            if (url.startsWith(public_urls[i])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

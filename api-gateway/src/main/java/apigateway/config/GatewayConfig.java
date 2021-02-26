@@ -26,6 +26,7 @@ public class GatewayConfig {
     public RouteLocator gatewayRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
                     .route(r -> r.path(env.getProperty("api.user.path"))
+                                    .filters(f -> f.filter(authHeaderFilter.apply(new Config())))
                                     .uri(env.getProperty("api.user.uri")))
                     .route(r -> r.path(env.getProperty("api.monitoring.path"))
                                     .filters(f -> f.filter(authHeaderFilter.apply(new Config())))

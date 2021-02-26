@@ -11,7 +11,7 @@ This application is made of six components:
 Components like Monitoring API, User API, Product API and Backup-Order API are connected via RabbitMQ. Dependencies which are used in this project are Spring Cloud Starter Gateway, Spring Boot Starter AMQP, Spring Boot Starter Data MongoDB, Spring Boot Starter Data MongoDB Reactive, Spring Boot Starter Security, Spring Boot Starter Web, Spring Cloud Consul Discovery, Java JWT, Commons Lang 3, Javax Servlet API.
 
 Endpoints for the system when all the components are started are:
-| Method | Endpoint | Component |
+| HTTP Method | Endpoint | Component |
 | ------ | ------ | ------ |
 | GET | http://localhost:8010/api/user/find | user-api |
 | GET | http://localhost:8010/api/user/find/{username} | user-api |

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/")
-public class ConsultController {
+public class ConsulController {
     
     @GetMapping("actuator/health")
     public ResponseEntity<Void> checkHealthStatus() {

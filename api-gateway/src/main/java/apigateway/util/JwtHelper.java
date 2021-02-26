@@ -31,7 +31,7 @@ public class JwtHelper {
         Method getSubject returns the subject from the JWT token
     */
     public String getSubject(String token) {
-        if (StringUtils.isEmpty(token)) {
+        if (StringUtils.isBlank(token)) {
             return null;
         }
 
