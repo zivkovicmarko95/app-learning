@@ -31,7 +31,6 @@ public class OrderBackupServiceImpl implements OrderBackupService {
     @Override
     public void sendMessageToOrderBackupApi(Order order) {
         logger.info(ProductsConstants.SENDING_MESSAGE_TO_RABBITMQ);
-        // Pronaci nacin da se posalje message ka rabbitmq-u
         rabbitTemplate.convertAndSend(env.getProperty("rabbitmq.order_backup_api_product_api.exchange"),
                 env.getProperty("rabbitmq.order_backup_api_product_api.routingKey"), order);
     }
