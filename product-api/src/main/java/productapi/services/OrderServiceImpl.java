@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import productapi.constants.ProductsConstants;
 import productapi.exceptions.OrderNotFoundException;
+import productapi.models.Monitoring;
 import productapi.models.Order;
 import productapi.repositories.OrderRepository;
 
@@ -23,10 +24,12 @@ public class OrderServiceImpl implements OrderService {
     
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final OrderRepository orderRepository;
+    private final MonitoringService monitoringService;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, MonitoringService monitoringService) {
         this.orderRepository = orderRepository;
+        this.monitoringService = monitoringService;
     }
 
     @Override
@@ -37,7 +40,7 @@ public class OrderServiceImpl implements OrderService {
             return optional.get();
         }
         
-        throw new OrderNotFoundException("Order with provided id is not found: " + id);
+        throw new OrderNotFoundException(ProductsConstants.ORDER_NOT_FOUND + id);
     }
 
     @Override
@@ -47,8 +50,17 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order save(Order order) {
-        logger.info(ProductsConstants.SAVING_ORDER_TO_DATABASE + order.getId());
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+
+        logger.info(ProductsConstants.SAVING_ORDER_TO_DATABASE + savedOrder.getId());
+        sendMessageToMonitoring(ProductsConstants.SAVING_ORDER_TO_DATABASE + savedOrder.getId());
+
+        return savedOrder;
+    }
+
+    private void sendMessageToMonitoring(String message) {
+        Monitoring monitoring = new Monitoring(message, ProductsConstants.PRODUCT_API);
+        monitoringService.sendMessageToMonitoringApi(monitoring);
     }
 
 }
