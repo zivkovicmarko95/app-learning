@@ -21,6 +21,7 @@ import productapi.exceptions.NotValidOrderedProductList;
 import productapi.exceptions.ProductNotFoundException;
 import productapi.exceptions.UserIdNotExistException;
 import productapi.models.Category;
+import productapi.models.Monitoring;
 import productapi.models.Order;
 import productapi.models.OrderedProduct;
 import productapi.models.Product;
@@ -32,13 +33,14 @@ import productapi.util.JwtHelper;
 public class ProductServiceImpl implements CategoryService, ProductService {
 
     /*
-        Service which is used for working with products and the functions which are provided in this
-        service are finding all the products, finding product by id, finding product by name, saving
-        product to the database, delete product by id, delete all the products, add product (buy it),
-        find category by id, find all the categories, find category by name, save category to the 
-        database, delete category by id, delete all the categories and search for the products by
-        specific parameter
-    */
+     * Service which is used for working with products and the functions which are
+     * provided in this service are finding all the products, finding product by id,
+     * finding product by name, saving product to the database, delete product by
+     * id, delete all the products, add product (buy it), find category by id, find
+     * all the categories, find category by name, save category to the database,
+     * delete category by id, delete all the categories and search for the products
+     * by specific parameter
+     */
 
     private final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
@@ -46,18 +48,20 @@ public class ProductServiceImpl implements CategoryService, ProductService {
     private final ProductRepository productRepository;
     private final OrderService orderService;
     private final OrderBackupService orderBackupService;
+    private final MonitoringService monitoringService;
     private final MongoTemplate mongoTemplate;
     private final JwtHelper jwtHelper;
 
     @Autowired
-    public ProductServiceImpl(CategoryRepository categoryRepository, ProductRepository productRepository, 
-                OrderService orderService, MongoTemplate mongoTemplate, OrderBackupService orderBackupService,
-                JwtHelper jwtHelper) {
+    public ProductServiceImpl(CategoryRepository categoryRepository, ProductRepository productRepository,
+            OrderService orderService, OrderBackupService orderBackupService, MonitoringService monitoringService,
+            MongoTemplate mongoTemplate, JwtHelper jwtHelper) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
         this.orderService = orderService;
-        this.mongoTemplate = mongoTemplate;
         this.orderBackupService = orderBackupService;
+        this.monitoringService = monitoringService;
+        this.mongoTemplate = mongoTemplate;
         this.jwtHelper = jwtHelper;
     }
 
@@ -82,9 +86,9 @@ public class ProductServiceImpl implements CategoryService, ProductService {
     }
 
     @Override
-    public Product findProductByName(String name) { 
+    public Product findProductByName(String name) {
         return productRepository.findByName(name);
-    }   
+    }
 
     @Override
     public Product saveProduct(Product product) {
@@ -99,10 +103,12 @@ public class ProductServiceImpl implements CategoryService, ProductService {
             category.add(saveProduct.getId());
             categoryRepository.save(category);
 
+            sendMessageToMonitoring(ProductsConstants.PRODUCT_CREATED + saveProduct.toString());
+
             return saveProduct;
         } else {
             saveProduct = productRepository.save(product);
-           
+
             Category newCategory = new Category();
             newCategory.setName(product.getCategory().getName());
             newCategory.setDescription(product.getCategory().getDescription());
@@ -116,7 +122,9 @@ public class ProductServiceImpl implements CategoryService, ProductService {
 
             saveProduct.setCategory(savedCategory);
             saveProduct = productRepository.save(product);
-            
+
+            sendMessageToMonitoring(ProductsConstants.PRODUCT_CREATED + saveProduct.toString());
+
             return saveProduct;
         }
     }
@@ -140,6 +148,8 @@ public class ProductServiceImpl implements CategoryService, ProductService {
 
         productRepository.deleteById(id);
 
+        sendMessageToMonitoring(ProductsConstants.DELETED_PRODUCT_BY_ID + id);
+
         logger.warn(ProductsConstants.DELETED_PRODUCT_BY_ID + id);
     }
 
@@ -149,17 +159,20 @@ public class ProductServiceImpl implements CategoryService, ProductService {
         productRepository.deleteAll();
 
         for (int i = 0; i < categories.size(); i++) {
-            categories.get(i).setProductIds(null);;
+            categories.get(i).setProductIds(null);
+            ;
         }
 
         categoryRepository.saveAll(categories);
+
+        sendMessageToMonitoring(ProductsConstants.DELETED_PRODUCTS_COLLECTION);
 
         logger.warn(ProductsConstants.DELETED_PRODUCTS_COLLECTION);
     }
 
     @Override
-    public Order addProduct(List<OrderedProduct> orderedProducts, String token) throws NotValidOrderedProductList, UserIdNotExistException,
-            NotValidProductIdException, ProductNotFoundException, NotValidProductQuantity {
+    public Order addProduct(List<OrderedProduct> orderedProducts, String token) throws NotValidOrderedProductList,
+            UserIdNotExistException, NotValidProductIdException, ProductNotFoundException, NotValidProductQuantity {
         if (!isOrederedProductsListValid(orderedProducts)) {
             throw new NotValidOrderedProductList(ProductsConstants.ORDERED_PRODUCTS_ARE_NOT_VALID);
         }
@@ -190,7 +203,7 @@ public class ProductServiceImpl implements CategoryService, ProductService {
     @Override
     public Category findCategoryById(String id) throws CategoryNotFoundException {
         Optional<Category> optional = categoryRepository.findById(id);
-        
+
         if (optional.isPresent()) {
             return optional.get();
         }
@@ -205,12 +218,16 @@ public class ProductServiceImpl implements CategoryService, ProductService {
 
     @Override
     public Category saveCategory(Category category) {
-        return categoryRepository.save(category);
+        Category savedCategory = categoryRepository.save(category);
+        
+        sendMessageToMonitoring(ProductsConstants.CATEGORY_CREATED + savedCategory.toString());
+        
+        return savedCategory;
     }
 
     @Override
-    public void deleteCategoryById(String id) throws NotValidProductIdException, ProductNotFoundException,
-            CategoryNotFoundException {
+    public void deleteCategoryById(String id)
+            throws NotValidProductIdException, ProductNotFoundException, CategoryNotFoundException {
         Category category = findCategoryById(id);
         List<String> productIds = category.getProductIds();
         List<Product> products = new ArrayList<>();
@@ -228,12 +245,16 @@ public class ProductServiceImpl implements CategoryService, ProductService {
 
         categoryRepository.deleteById(id);
 
+        sendMessageToMonitoring(ProductsConstants.DELETED_CATEGORY_BY_ID + id);
+
         logger.warn(ProductsConstants.DELETED_CATEGORY_BY_ID + id);
     }
 
     @Override
     public void deleteAllCategories() {
         categoryRepository.deleteAll();
+
+        sendMessageToMonitoring(ProductsConstants.DELETED_CATEGORY_COLLECTION);
 
         logger.warn(ProductsConstants.DELETED_CATEGORY_COLLECTION);
     }
@@ -252,8 +273,9 @@ public class ProductServiceImpl implements CategoryService, ProductService {
         Criteria criteria = new Criteria();
         String searchQuery = ".*" + param + ".*";
 
-        criteria.orOperator(Criteria.where("name").regex(searchQuery, "i"), Criteria.where("title").regex(searchQuery, "i"), Criteria.where("description").regex(searchQuery, "i"));
-        
+        criteria.orOperator(Criteria.where("name").regex(searchQuery, "i"),
+                Criteria.where("title").regex(searchQuery, "i"), Criteria.where("description").regex(searchQuery, "i"));
+
         Query query = new Query(criteria);
         foundProducts = mongoTemplate.find(query, Product.class);
 
@@ -288,11 +310,16 @@ public class ProductServiceImpl implements CategoryService, ProductService {
         for (int i = 0; i < orderedProducts.size(); i++) {
             OrderedProduct orderedProduct = orderedProducts.get(i);
             Product product = findProductById(orderedProduct.getProductId());
-            
+
             product.setQuantity(product.getQuantity() - orderedProduct.getQty());
 
             saveProduct(product);
         }
+    }
+
+    private void sendMessageToMonitoring(String message) {
+        Monitoring monitoring = new Monitoring(message, ProductsConstants.PRODUCT_API);
+        monitoringService.sendMessageToMonitoringApi(monitoring);
     }
 
 }

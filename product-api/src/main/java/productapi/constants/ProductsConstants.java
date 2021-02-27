@@ -4,9 +4,9 @@ public class ProductsConstants {
     
     public static final String PRODUCT_API = "product-api";
 
-    public static final String DELETED_PRODUCT_BY_ID = "(userId, productId) deleted the product from the database: ";
+    public static final String DELETED_PRODUCT_BY_ID = "Deleted the product from the database: ";
     public static final String DELETED_PRODUCTS_COLLECTION = "Deleting whole products collection from the database. ";
-    public static final String DELETED_CATEGORY_BY_ID = "(categoryId, productId) deleted the category from the database: ";
+    public static final String DELETED_CATEGORY_BY_ID = "Deleted the category from the database: ";
     public static final String DELETED_CATEGORY_COLLECTION = "Deleting whole category collection from the database. ";
 
     public static final String USER_CREATED_ORDER = "INFO: Order is created. (userId, productId): ";
@@ -34,4 +34,7 @@ public class ProductsConstants {
     public static final String SENDING_MESSAGE_TO_RABBITMQ = "Sending message to RabbitMQ and monitoring api";
 
     public static final String SENDING_MESSAGE_TO_ORDER_BACKUP_API = "Sending message to Backup order API via HTTP";
+
+    public static final String PRODUCT_CREATED = "Product created and saved to the database: ";
+    public static final String CATEGORY_CREATED = "Category created and saved to the database: ";
 }
