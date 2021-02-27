@@ -239,14 +239,23 @@ public class ProductServiceImpl implements CategoryService, ProductService {
     }
 
     @Override
-    public List<Product> search(String param) {
+    public List<Product> search(String param) throws NotValidProductIdException, ProductNotFoundException {
+        List<Product> foundProducts = new ArrayList<>();
+
+        if (ObjectId.isValid(param)) {
+            Product product = findProductById(param);
+            foundProducts.add(product);
+
+            return foundProducts;
+        }
+
         Criteria criteria = new Criteria();
         String searchQuery = ".*" + param + ".*";
 
         criteria.orOperator(Criteria.where("name").regex(searchQuery, "i"), Criteria.where("title").regex(searchQuery, "i"), Criteria.where("description").regex(searchQuery, "i"));
         
         Query query = new Query(criteria);
-        List<Product> foundProducts = mongoTemplate.find(query, Product.class);
+        foundProducts = mongoTemplate.find(query, Product.class);
 
         return foundProducts;
     }

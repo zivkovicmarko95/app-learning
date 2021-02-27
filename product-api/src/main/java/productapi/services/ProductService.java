@@ -21,7 +21,7 @@ public interface ProductService {
 
     Product saveProduct(Product product);
 
-    List<Product> search(String param);
+    List<Product> search(String param) throws NotValidProductIdException, ProductNotFoundException;
 
     void deleteProductById(String id) throws NotValidProductIdException, ProductNotFoundException;
 

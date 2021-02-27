@@ -67,7 +67,8 @@ public class ProductController {
     }
 
     @GetMapping("/search/{param}")
-    public ResponseEntity<List<ProductDTO>> search(@PathVariable String param) {
+    public ResponseEntity<List<ProductDTO>> search(@PathVariable String param)
+            throws NotValidProductIdException, ProductNotFoundException {
         List<Product> foundProducts = productService.search(param);
 
         if (foundProducts.size() == 0) {
