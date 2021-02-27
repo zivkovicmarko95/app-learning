@@ -118,6 +118,14 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
+    @ExceptionHandler(NotValidIdException.class)
+    public ResponseEntity<HttpResponse> notValidIdException(NotValidIdException e) {
+        sendMessageToMonitoringApi(e);
+        logger.error(ExceptionUtils.getStackTrace(e));
+
+        return createHttpResponse(HttpStatus.BAD_REQUEST, MessagesConstants.NOT_VALID_ID);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<HttpResponse> internalServerErrorException(Exception e) {
         sendMessageToMonitoringApi(e);

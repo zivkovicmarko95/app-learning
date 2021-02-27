@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import userapi.constants.MessagesConstants;
 import userapi.exceptions.EmailExistException;
 import userapi.exceptions.EmailNotFoundException;
+import userapi.exceptions.NotValidIdException;
 import userapi.exceptions.UserNotFoundException;
 import userapi.exceptions.UsernameExistException;
 import userapi.models.Monitoring;
@@ -68,7 +70,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User findById(String id) {
+    public User findById(String id) throws NotValidIdException {
+        if (!ObjectId.isValid(id)) {
+            throw new NotValidIdException(MessagesConstants.NOT_VALID_ID + id);
+        }
+
         Optional<User> optionalUser = userRepository.findById(id);
 
         if (optionalUser.isPresent()) {
@@ -85,19 +91,23 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User save(User object) {
-        sendMonitoringMessage(MessagesConstants.USER_CREATED, MessagesConstants.USER_API);
+        sendMonitoringMessage(MessagesConstants.USER_CREATED + object.toString());
         return userRepository.save(object);
     }
 
     @Override
-    public void deleteById(String id) {
-        sendMonitoringMessage(MessagesConstants.USER_DELETED + id, MessagesConstants.USER_API);
+    public void deleteById(String id) throws NotValidIdException {
+        if (!ObjectId.isValid(id)) {
+            throw new NotValidIdException(MessagesConstants.NOT_VALID_ID + id);
+        }
+
+        sendMonitoringMessage(MessagesConstants.USER_DELETED + id);
         userRepository.deleteById(id);
     }
 
     @Override
     public void deleteAll() {
-        sendMonitoringMessage(MessagesConstants.USER_COLLECTION_DELETED, MessagesConstants.USER_API);
+        sendMonitoringMessage(MessagesConstants.USER_COLLECTION_DELETED);
         userRepository.deleteAll();
     }
 
@@ -116,7 +126,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setIsActive(true);
         user.setIsNotLocked(true);
 
-        User savedUser = userRepository.save(user);
+        User savedUser = save(user);
 
         return savedUser;
     }
@@ -150,7 +160,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User resetPassword(String email, String newPassword) throws EmailNotFoundException {
-        sendMonitoringMessage(MessagesConstants.USER_RESTART_PASSWORD + email, MessagesConstants.USER_API);
+        sendMonitoringMessage(MessagesConstants.USER_RESTART_PASSWORD + email);
         
         User user = findUserByEmail(email);
         
@@ -206,8 +216,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return bCryptPasswordEncoder.encode(password);
     }
 
-    private void sendMonitoringMessage(String message, String api) {
-        Monitoring monitoring = new Monitoring(message, api);
+    private void sendMonitoringMessage(String message) {
+        Monitoring monitoring = new Monitoring(message, MessagesConstants.USER_API);
 
         logger.info(MessagesConstants.SENDING_MESSAGE_TO_RABBITMQ);
 

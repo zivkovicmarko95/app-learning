@@ -3,7 +3,6 @@ package userapi.controllers;
 import java.util.HashMap;
 import java.util.List;
 
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
@@ -24,6 +23,7 @@ import userapi.dtos.UpdateUserDTO;
 import userapi.dtos.UserDTO;
 import userapi.exceptions.EmailExistException;
 import userapi.exceptions.EmailNotFoundException;
+import userapi.exceptions.NotValidIdException;
 import userapi.exceptions.UserNotFoundException;
 import userapi.exceptions.UsernameExistException;
 import userapi.models.HttpResponse;
@@ -38,12 +38,13 @@ import userapi.util.Mapper;
 public class UserController {
 
     /*
-        User controller is used for processing users HTTP requests and to work with users profile, 
-        provide valid JWT token to the user and so on
-        In this controller, user can hit endopint for creating account, login, updating their profile,
-        finding all the profiles which exists in the database, reset password, find the profile by specific
-        name, delete profile by id and delete all the users profile collection
-    */
+     * User controller is used for processing users HTTP requests and to work with
+     * users profile, provide valid JWT token to the user and so on In this
+     * controller, user can hit endopint for creating account, login, updating their
+     * profile, finding all the profiles which exists in the database, reset
+     * password, find the profile by specific name, delete profile by id and delete
+     * all the users profile collection
+     */
 
     public static final String BASE_URL = "/api/user";
 
@@ -99,6 +100,11 @@ public class UserController {
         return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<User> findUserById(@PathVariable String id) throws NotValidIdException {
+        return new ResponseEntity<>(userService.findById(id), HttpStatus.OK);
+    }
+
     @PostMapping("/resetPassword")
     public ResponseEntity<HttpResponse> resetPassword(@RequestBody HashMap<String, String> params)
             throws EmailNotFoundException {
@@ -113,13 +119,10 @@ public class UserController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable String id, @RequestBody HashMap<String, String> params) {
+    public ResponseEntity<Void> deleteById(@PathVariable String id, @RequestBody HashMap<String, String> params)
+            throws NotValidIdException {
         if (!env.getProperty("server.secret").equals(params.get("access-token"))) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
-        if (!ObjectId.isValid(id)) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         userService.deleteById(id);
