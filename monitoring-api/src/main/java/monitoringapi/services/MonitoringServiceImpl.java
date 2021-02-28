@@ -18,7 +18,7 @@ import monitoringapi.repositories.MonitoringRepository;
 public class MonitoringServiceImpl implements MonitoringService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    
+
     private final MonitoringRepository userMonitoringRepository;
 
     @Autowired
@@ -27,9 +27,9 @@ public class MonitoringServiceImpl implements MonitoringService {
     }
 
     /*
-        Method findById returns Monitoring object or null which depends on if the monitoring object
-        exists in the database with the passed id.
-    */
+     * Method findById returns Monitoring object or null which depends on if the
+     * monitoring object exists in the database with the passed id.
+     */
     @Override
     public Monitoring findById(String id) {
         Optional<Monitoring> optional = userMonitoringRepository.findById(id);
@@ -41,26 +41,28 @@ public class MonitoringServiceImpl implements MonitoringService {
         return null;
     }
 
-    /* 
-        Method findAll returns list of Monitoring objects which exists in the database
-    */
+    /*
+     * Method findAll returns list of Monitoring objects which exists in the
+     * database
+     */
     @Override
     public List<Monitoring> findAll() {
         return userMonitoringRepository.findAll();
     }
 
-    /* 
-        Method save is used for saving Monitoring object to the database
-    */
+    /*
+     * Method save is used for saving Monitoring object to the database
+     */
     @Override
     public Monitoring save(Monitoring object) {
         return userMonitoringRepository.save(object);
     }
 
     /*
-        Method deleteById is used for deleting Monitoring object by passing id
-        If Monitoring object exists in the database with passed id, it will be found and deleted
-    */
+     * Method deleteById is used for deleting Monitoring object by passing id If
+     * Monitoring object exists in the database with passed id, it will be found and
+     * deleted
+     */
     @Override
     public void deleteById(String id) {
         logger.warn(MonitoringMessage.DELETING_LOG_BY_ID + id);
@@ -68,22 +70,22 @@ public class MonitoringServiceImpl implements MonitoringService {
     }
 
     /*
-        Method deleteAll is used for deleting whole database monitoring collection
-    */
+     * Method deleteAll is used for deleting whole database monitoring collection
+     */
     @Override
     public void deleteAll() {
         logger.warn(MonitoringMessage.DELETING_LOG_DATABASE);
         userMonitoringRepository.deleteAll();
     }
 
-    /* 
-        This method is used if user has not valid credentials and Monitoring object will be created and
-        saved to the database
-    */
+    /*
+     * This method is used if user has not valid credentials and Monitoring object
+     * will be created and saved to the database
+     */
     @Override
     public void notValidCredentialsLog(String message, String api, String id) {
         Monitoring monitoring = null;
-        
+
         if (id != null) {
             monitoring = new Monitoring(message + id, api);
             logger.warn(message + id);
@@ -94,5 +96,5 @@ public class MonitoringServiceImpl implements MonitoringService {
 
         userMonitoringRepository.save(monitoring);
     }
-    
+
 }
