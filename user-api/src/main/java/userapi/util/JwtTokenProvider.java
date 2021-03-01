@@ -1,6 +1,10 @@
 package userapi.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -14,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +40,7 @@ public class JwtTokenProvider {
     }
 
     public String generateJwtToken(UserPrincipal userPrincipal) {
+        final String[] authorities = getAuthoritiesForUser(userPrincipal);
         final long expirationTime = Long.parseLong(env.getProperty("jwt.token.expirationTime"));
         
         return JWT.create()
@@ -42,23 +49,30 @@ public class JwtTokenProvider {
             .withClaim("id", userPrincipal.getUser().getId())
             .withClaim("email", userPrincipal.getUser().getEmail())
             .withClaim("application", "app-learning")
+            .withArrayClaim(env.getProperty("jwt.token.authorities"), authorities)
             .withExpiresAt(new Date( System.currentTimeMillis() + expirationTime ))
             .sign(Algorithm.HMAC512(env.getProperty("jwt.token.secret")));
     }
 
-    public Authentication getAuthentication(String username, HttpServletRequest req) {
+    public List<GrantedAuthority> getAuthorities(String token) {
+        final String[] authorities = getAuthoritiesFromToken(token);
+
+        return Arrays.stream(authorities).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    }
+
+    public Authentication getAuthentication(String username, List<GrantedAuthority> authorities, HttpServletRequest req) {
         if (StringUtils.isEmpty(username)) {
             return null;
         }
 
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, null, null);
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
         usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
 
         return usernamePasswordAuthenticationToken;
     }
 
     public boolean isTokenValid(String username, String token) {
-        if (StringUtils.isEmpty(username) || StringUtils.isEmpty(token)) {
+        if (StringUtils.isBlank(username) || StringUtils.isBlank(token)) {
             return false;
         }
 
@@ -94,6 +108,22 @@ public class JwtTokenProvider {
         }
 
         return jwtverVerifier;
+    }
+
+    private String[] getAuthoritiesForUser(UserPrincipal userPrincipal) {
+        List<String> authorities = new ArrayList<>();
+
+        for (GrantedAuthority grantedAuthority : userPrincipal.getAuthorities()) {
+            authorities.add(grantedAuthority.getAuthority());
+        }
+
+        return authorities.toArray(new String[0]);
+    }
+
+    private String[] getAuthoritiesFromToken(String token) {
+        final JWTVerifier verifier = getJwtVerifier();
+        
+        return verifier.verify(token).getClaim(env.getProperty("jwt.token.authorities")).asArray(String.class);
     }
 
 }

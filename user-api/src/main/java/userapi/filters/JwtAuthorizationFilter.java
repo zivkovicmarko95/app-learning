@@ -1,6 +1,7 @@
 package userapi.filters;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -12,6 +13,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -50,7 +52,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String subject = jwtTokenProvider.getSubject(token);
         
         if (jwtTokenProvider.isTokenValid(subject, token)) {
-            Authentication authentication = jwtTokenProvider.getAuthentication(subject, request);
+            List<GrantedAuthority> authorities = jwtTokenProvider.getAuthorities(token);
+            Authentication authentication = jwtTokenProvider.getAuthentication(subject, authorities, request);
+            
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } else {
             SecurityContextHolder.clearContext();

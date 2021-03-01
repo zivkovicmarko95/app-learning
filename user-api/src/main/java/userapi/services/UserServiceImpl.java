@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import userapi.constants.MessagesConstants;
+import userapi.enumeration.Role;
 import userapi.exceptions.EmailExistException;
 import userapi.exceptions.EmailNotFoundException;
 import userapi.exceptions.NotValidIdException;
@@ -123,6 +124,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(encryptPassword(password));
+        user.setRole(Role.ROLE_USER.name());
+        user.setAuthorities(Role.ROLE_USER.getAuthorities());
         user.setIsActive(true);
         user.setIsNotLocked(true);
 

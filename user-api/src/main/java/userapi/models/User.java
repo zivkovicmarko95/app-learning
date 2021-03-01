@@ -10,8 +10,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class User {
 
     /*
-        Class which represents User object
-    */
+     * Class which represents User object
+     */
 
     @Id
     private String id;
@@ -25,6 +25,9 @@ public class User {
 
     private Date createdDate;
 
+    private String role;
+    private String[] authorities;
+
     private boolean isActive;
     private boolean isNotLocked;
 
@@ -33,13 +36,15 @@ public class User {
     }
 
     public User(String userId, String firstName, String lastName, String username, String password, String email,
-            boolean isActive, boolean isNotLocked) {
+            String role, String[] authorities, boolean isActive, boolean isNotLocked) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.password = password;
         this.email = email;
+        this.role = role;
+        this.authorities = authorities;
         this.isActive = isActive;
         this.isNotLocked = isNotLocked;
         this.createdDate = new Date();
@@ -101,6 +106,26 @@ public class User {
         return this.createdDate;
     }
 
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getRole() {
+        return this.role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String[] getAuthorities() {
+        return this.authorities;
+    }
+
+    public void setAuthorities(String[] authorities) {
+        this.authorities = authorities;
+    }
+
     public boolean isIsActive() {
         return this.isActive;
     }
@@ -130,7 +155,8 @@ public class User {
         return "{" + " id='" + getId() + "'" + ", userId='" + getUserId() + "'" + ", firstName='" + getFirstName() + "'"
                 + ", lastName='" + getLastName() + "'" + ", username='" + getUsername() + "'" + ", password='"
                 + getPassword() + "'" + ", email='" + getEmail() + "'" + ", createdDate='" + getCreatedDate() + "'"
-                + ", isActive='" + isIsActive() + "'" + ", isNotLocked='" + isIsNotLocked() + "'" + "}";
+                + ", role='" + getRole() + "'" + ", authorities='" + getAuthorities() + "'" + ", isActive='"
+                + isIsActive() + "'" + ", isNotLocked='" + isIsNotLocked() + "'" + "}";
     }
 
     @Override
@@ -145,13 +171,14 @@ public class User {
                 && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName)
                 && Objects.equals(username, user.username) && Objects.equals(password, user.password)
                 && Objects.equals(email, user.email) && Objects.equals(createdDate, user.createdDate)
+                && Objects.equals(role, user.role) && Objects.equals(authorities, user.authorities)
                 && isActive == user.isActive && isNotLocked == user.isNotLocked;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userId, firstName, lastName, username, password, email, createdDate, isActive,
-                isNotLocked);
+        return Objects.hash(id, userId, firstName, lastName, username, password, email, createdDate, role, authorities,
+                isActive, isNotLocked);
     }
 
 }

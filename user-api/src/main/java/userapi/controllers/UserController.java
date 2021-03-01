@@ -121,9 +121,6 @@ public class UserController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable String id, @RequestBody HashMap<String, String> params)
             throws NotValidIdException {
-        if (!env.getProperty("server.secret").equals(params.get("access-token"))) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
 
         userService.deleteById(id);
 
@@ -132,10 +129,6 @@ public class UserController {
 
     @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteAll(@RequestBody HashMap<String, String> params) {
-        if (!env.getProperty("server.secret").equals(params.get("access-token"))) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
         userService.deleteAll();
         
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
