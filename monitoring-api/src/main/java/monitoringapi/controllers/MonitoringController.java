@@ -31,7 +31,7 @@ public class MonitoringController {
         and it is not allowed to user to create a Monitoring object
     */
 
-    public static final String BASE_URL = "/api/monitoring";
+    public static final String BASE_URL = "/api/monitorings";
     
     private final Logger logger = LoggerFactory.getLogger(getClass());
 

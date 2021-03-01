@@ -31,7 +31,7 @@ public class BackupOrderController {
         order by id
     */
 
-    public static final String BASE_URL = "/api/order";
+    public static final String BASE_URL = "/api/orders";
 
     private final OrderService orderService;
 
