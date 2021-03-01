@@ -46,7 +46,7 @@ public class UserController {
      * all the users profile collection
      */
 
-    public static final String BASE_URL = "/api/user";
+    public static final String BASE_URL = "/api/users";
 
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
@@ -95,7 +95,7 @@ public class UserController {
         return new ResponseEntity<>(mapper.convertUserToUserDTO(updateUser), HttpStatus.OK);
     }
 
-    @GetMapping("/find")
+    @GetMapping
     public ResponseEntity<List<User>> getAllUsers(@RequestBody HashMap<String, String> params) {
         return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
     }
@@ -112,13 +112,7 @@ public class UserController {
         return response(HttpStatus.OK, MessagesConstants.EMAIL_SENT + params.get("email"));
     }
 
-    @GetMapping("/find/{username}")
-    public ResponseEntity<UserDTO> getUser(@PathVariable String username) {
-        User user = userService.findUserByUsername(username);
-        return new ResponseEntity<>(mapper.convertUserToUserDTO(user), HttpStatus.OK);
-    }
-
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable String id, @RequestBody HashMap<String, String> params)
             throws NotValidIdException {
 
@@ -127,7 +121,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping
     public ResponseEntity<Void> deleteAll(@RequestBody HashMap<String, String> params) {
         userService.deleteAll();
         

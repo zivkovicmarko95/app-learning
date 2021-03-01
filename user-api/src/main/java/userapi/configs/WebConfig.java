@@ -62,7 +62,7 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeRequests().antMatchers(public_urls).permitAll()
-            .antMatchers(HttpMethod.DELETE, "/api/user/delete/**").hasRole("SUPER_ADMIN")
+            .antMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("SUPER_ADMIN")
             .anyRequest().authenticated()
             .and()
             .exceptionHandling().accessDeniedHandler(jwtAccessDeniedHandler)
