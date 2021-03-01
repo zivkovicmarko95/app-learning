@@ -41,7 +41,7 @@ public class ProductController {
         can add the product (buy product)
     */
 
-    public static final String BASE_URL = "/api/product";
+    public static final String BASE_URL = "/api/products";
 
     private final ProductServiceImpl productService;
     private final Mapper mapper;
