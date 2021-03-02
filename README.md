@@ -38,5 +38,5 @@ Endpoints for the system when all the components are started are:
 | DELETE | http://localhost:8010/api/orders/{id} | order-backup-api |
 | DELETE | http://localhost:8010/api/products/{id} | product-api |
 | DELETE | http://localhost:8010/api/products/ | product-api |
-| DELETE | http://localhost:8010/api/product/categories/{id} | product-api |
-| DELETE | http://localhost:8010/api/product/categories/ | product-api |
+| DELETE | http://localhost:8010/api/products/categories/{id} | product-api |
+| DELETE | http://localhost:8010/api/products/categories/ | product-api |
