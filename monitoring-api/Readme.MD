@@ -10,7 +10,7 @@ Dependencies that are used in the Monitoring component are Spring Boot Starter A
 Endpoints for monitoring-api components are:
 | Method | Endpoint |
 | ------ | ------ |
-| GET | http://localhost:8011/api/monitoring/{id} |
-| GET | http://localhost:8011/api/monitoring |
-| DELETE | http://localhost:8011/api/monitoring |
-| DELETE | http://localhost:8011/api/monitoring/{id} |
+| GET | http://localhost:8011/api/monitorings/{id} |
+| GET | http://localhost:8011/api/monitorings |
+| DELETE | http://localhost:8011/api/monitorings |
+| DELETE | http://localhost:8011/api/monitorings/{id} |

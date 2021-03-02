@@ -13,12 +13,12 @@ User-API is used for authentication and authorization and this component provide
 Endpoint for user-api components are:
 | Method | Endpoint |
 | ------ | ------ |
-| GET | http://localhost:8012/api/user/find |
-| GET | http://localhost:8012/api/user/find/{username} |
-| POST | http://localhost:8012/api/user/register |
-| POST | http://localhost:8012/api/user/login |
-| POST | http://localhost:8012/api/user/update |
-| POST | http://localhost:8012/api/user/resetPassword |
-| DELETE | http://localhost:8012/api/user/delete/{id} |
-| DELETE | http://localhost:8012/api/user/delete |
+| GET | http://localhost:8012/api/users |
+| GET | http://localhost:8012/api/users/{id} |
+| POST | http://localhost:8012/api/users/register |
+| POST | http://localhost:8012/api/users/login |
+| POST | http://localhost:8012/api/users/update |
+| POST | http://localhost:8012/api/users/resetPassword |
+| DELETE | http://localhost:8012/api/users/{id} |
+| DELETE | http://localhost:8012/api/users |
  

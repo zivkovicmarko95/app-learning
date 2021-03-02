@@ -11,7 +11,7 @@ Dependencies which are used in the Monitoring component are Spring Boot Starter 
 Endpoints for order-backup-api components are:
 | Method | Endpoint |
 | ------ | ------ |
-| GET | http://localhost:8014/api/order/{id} |
-| GET | http://localhost:8014/api/order |
-| POST | http://localhost:8014/api/order |
-| DELETE | http://localhost:8014/api/order/{id} |
+| GET | http://localhost:8014/api/orders/{id} |
+| GET | http://localhost:8014/api/orders |
+| POST | http://localhost:8014/api/orders |
+| DELETE | http://localhost:8014/api/orders/{id} |

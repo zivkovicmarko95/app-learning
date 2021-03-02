@@ -52,13 +52,13 @@ public class ProductController {
         this.mapper = mapper;
     }
 
-    @GetMapping("/find")
+    @GetMapping
     public ResponseEntity<List<ProductDTO>> findAllProducts() {
         List<Product> products = productService.findAllProducts();
         return new ResponseEntity<>(mapper.convertProductToProductDTO(products), HttpStatus.OK);
     }
 
-    @GetMapping("/find/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<ProductDTO> findProductById(@PathVariable String id)
             throws NotValidProductIdException, ProductNotFoundException {
         Product product = productService.findProductById(id);
@@ -105,19 +105,19 @@ public class ProductController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/category")
+    @GetMapping("/categories")
     public ResponseEntity<List<Category>> findAllCategories() {
         List<Category> categories = productService.findAllCategories();
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
-    @GetMapping("/category/{id}")
+    @GetMapping("/categories/{id}")
     public ResponseEntity<Category> findCategoryById(@PathVariable String id) throws CategoryNotFoundException {
         Category category = productService.findCategoryById(id);
         return new ResponseEntity<>(category, HttpStatus.OK);
     }
 
-    @DeleteMapping("/category/{id}")
+    @DeleteMapping("/categories/{id}")
     public ResponseEntity<Void> deleteCategoryById(@PathVariable String id)
             throws NotValidProductIdException, ProductNotFoundException, CategoryNotFoundException {
         productService.deleteCategoryById(id);
@@ -125,7 +125,7 @@ public class ProductController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/category")
+    @DeleteMapping("/categories")
     public ResponseEntity<Void> deleteAllCategories() {
         productService.deleteAllCategories();
 
