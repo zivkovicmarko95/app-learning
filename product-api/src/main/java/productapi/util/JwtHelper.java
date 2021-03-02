@@ -1,6 +1,9 @@
 package productapi.util;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -11,16 +14,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtHelper {
-    
-    /* 
-        Class which is used for working with JWT token which has functions for 
-        getting the subject from the JWT token, checking if token is valid, getting userId
-        from the JWT token and method for parsing JWT token
-    */
+
+    /*
+     * Class which is used for working with JWT token which has functions for
+     * getting the subject from the JWT token, checking if token is valid, getting
+     * userId from the JWT token and method for parsing JWT token
+     */
 
     private final Environment env;
 
@@ -30,8 +35,8 @@ public class JwtHelper {
     }
 
     /*
-        Method getSubject returns the subject from the JWT token
-    */
+     * Method getSubject returns the subject from the JWT token
+     */
     public String getSubject(String token) {
         if (StringUtils.isBlank(token)) {
             return null;
@@ -45,8 +50,8 @@ public class JwtHelper {
     }
 
     /*
-        Method getUserId returns the userId from the JWT token
-    */
+     * Method getUserId returns the userId from the JWT token
+     */
     public String getUserId(String token) {
         final String tokenValue = parseToken(token);
         final JWTVerifier verifier = getJwtVerifier();
@@ -54,8 +59,8 @@ public class JwtHelper {
         String userId = null;
 
         if (claimId != null) {
-            userId = claimId.asString();  
-            
+            userId = claimId.asString();
+
             if (!ObjectId.isValid(userId)) {
                 return null;
             }
@@ -64,15 +69,15 @@ public class JwtHelper {
         return userId;
     }
 
-    /* 
-        Method isJwtTokenValid checks if the JWT token is valid or not. It checks if the subject
-        is null or not and checks if the JWT token is expired or not
-    */
+    /*
+     * Method isJwtTokenValid checks if the JWT token is valid or not. It checks if
+     * the subject is null or not and checks if the JWT token is expired or not
+     */
     public boolean isJwtTokenValid(String token) {
         final String tokenValue = parseToken(token);
         final JWTVerifier verifier = getJwtVerifier();
         final String subject = verifier.verify(tokenValue).getSubject();
-        
+
         if (subject != null && !isTokenExpired(tokenValue)) {
             return true;
         }
@@ -81,21 +86,35 @@ public class JwtHelper {
     }
 
     /*
-        Method parseToken uses JWT token which is in next form: Bearer tokenValue
-        This method uses only tokenValue, without Bearer
-    */
+     * Method parseToken uses JWT token which is in next form: Bearer tokenValue
+     * This method uses only tokenValue, without Bearer
+     */
     public String parseToken(String token) {
         final String tokenValue = token.substring(env.getProperty("jwt.token.header").length()).trim();
 
         return tokenValue;
     }
 
-    /* 
-        Method getJwtVerifier returns JWT Verifier, which requirs that token is built by the HMAC512 algorithm
-    */
+    public List<GrantedAuthority> getAuthorities(String token) {
+        final String tokenValue = parseToken(token);
+        final String[] authorities = getAuthoritiesFromToken(tokenValue);
+
+        return Arrays.stream(authorities).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    }
+
+    private String[] getAuthoritiesFromToken(String tokenValue) {
+        final JWTVerifier verifier = getJwtVerifier();
+
+        return verifier.verify(tokenValue).getClaim(env.getProperty("jwt.token.authorities")).asArray(String.class);
+    }
+
+    /*
+     * Method getJwtVerifier returns JWT Verifier, which requirs that token is built
+     * by the HMAC512 algorithm
+     */
     private JWTVerifier getJwtVerifier() {
         JWTVerifier verifier = null;
-        
+
         try {
             Algorithm algorithm = Algorithm.HMAC512(env.getProperty("jwt.token.secret"));
             verifier = JWT.require(algorithm).build();
@@ -107,13 +126,13 @@ public class JwtHelper {
     }
 
     /*
-        Method isTokenExpired checks if the Token is expired or not. It checks if the expires date and time
-        is before current date and time
-    */
+     * Method isTokenExpired checks if the Token is expired or not. It checks if the
+     * expires date and time is before current date and time
+     */
     private boolean isTokenExpired(String tokenValue) {
         final JWTVerifier verifier = getJwtVerifier();
         final Date tokeExpirationDate = verifier.verify(tokenValue).getExpiresAt();
-        
+
         return tokeExpirationDate.before(new Date());
     }
 

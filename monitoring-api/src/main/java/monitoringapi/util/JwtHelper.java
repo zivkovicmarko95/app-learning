@@ -1,6 +1,9 @@
 package monitoringapi.util;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -9,6 +12,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -66,6 +71,19 @@ public class JwtHelper {
         final String tokenValue = token.substring(env.getProperty("jwt.token.header").length()).trim();
 
         return tokenValue;
+    }
+
+    public List<GrantedAuthority> getAuthorities(String token) {
+        final String tokenValue = parseToken(token);
+        final String[] authorities = getAuthoritiesFromToken(tokenValue);
+
+        return Arrays.stream(authorities).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    }
+
+    private String[] getAuthoritiesFromToken(String tokenValue) {
+        final JWTVerifier verifier = getJwtVerifier();
+        
+        return verifier.verify(tokenValue).getClaim(env.getProperty("jwt.token.authorities")).asArray(String.class);
     }
 
     /* 

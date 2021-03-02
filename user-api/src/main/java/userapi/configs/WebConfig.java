@@ -37,7 +37,7 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserDetailsService userDetailsService;
 
-    private final String[] public_urls = { "/actuator/health", "/api/user/login", "/api/user/register", "/api/user/resetpassword/**" };
+    private final String[] public_urls = { "/actuator/health", "/api/users/login", "/api/users/register", "/api/users/resetpassword/**" };
 
     @Autowired
     public WebConfig(JwtAuthorizationFilter jwtAuthorizationFilter, JwtAccessDeniedHandler jwtAccessDeniedHandler, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, 

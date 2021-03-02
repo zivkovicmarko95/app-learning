@@ -138,7 +138,7 @@ public class ProductServiceImpl implements CategoryService, ProductService {
             List<String> productIds = category.getProductIds();
 
             for (int i = 0; i < productIds.size(); i++) {
-                if (id == productIds.get(i)) {
+                if (id.equals(productIds.get(i))) {
                     productIds.remove(i);
                 }
             }
@@ -160,7 +160,6 @@ public class ProductServiceImpl implements CategoryService, ProductService {
 
         for (int i = 0; i < categories.size(); i++) {
             categories.get(i).setProductIds(null);
-            ;
         }
 
         categoryRepository.saveAll(categories);

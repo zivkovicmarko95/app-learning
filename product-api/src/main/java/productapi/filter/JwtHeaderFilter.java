@@ -1,6 +1,7 @@
 package productapi.filter;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -42,8 +44,9 @@ public class JwtHeaderFilter extends OncePerRequestFilter {
         try {
             if (jwtHelper.isJwtTokenValid(token)) {
                 final String subject = jwtHelper.getSubject(token);
+                final List<GrantedAuthority> authorities = jwtHelper.getAuthorities(token);
 
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(subject, null, null);
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(subject, null, authorities);
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }

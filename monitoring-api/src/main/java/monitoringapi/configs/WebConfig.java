@@ -33,15 +33,16 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
-        .cors()
-        .and()
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
-        .exceptionHandling().authenticationEntryPoint((req, res, e) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED))
-        .and()
-        .addFilterAfter(jwtHeaderFilter, UsernamePasswordAuthenticationFilter.class)
-        .authorizeRequests().antMatchers(publicUrls).permitAll()
-        .anyRequest().authenticated();
+            .cors()
+            .and()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .exceptionHandling().authenticationEntryPoint((req, res, e) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+            .and()
+            .addFilterAfter(jwtHeaderFilter, UsernamePasswordAuthenticationFilter.class)
+            .authorizeRequests().antMatchers(publicUrls).permitAll()
+            .antMatchers("/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+            .anyRequest().authenticated();
     }
 
 }

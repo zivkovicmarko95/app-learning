@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -20,8 +21,6 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
         This class is used for Web security configuration and user needs to have valid 
         JWT token to access any of the endpoints from this component
     */
-    
-    private String[] publicUrls = { "/actuator/health", "/api/product/search/**", "/api/product/find/**" };
 
     @Autowired
     private JwtHeaderFilter jwtHeaderFilter;
@@ -36,7 +35,10 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
             .exceptionHandling().authenticationEntryPoint((req, res, e) -> res.sendError(HttpServletResponse.SC_UNAUTHORIZED))
             .and()
             .addFilterAfter(jwtHeaderFilter, UsernamePasswordAuthenticationFilter.class)
-            .authorizeRequests().antMatchers(publicUrls).permitAll()
+            .authorizeRequests().antMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+            .antMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("SUPER_ADMIN")
+            .antMatchers(HttpMethod.POST, "/api/products").hasAnyRole("SUPER_ADMIN", "ADMIN")
+            .antMatchers("/actuator/health").permitAll()
             .anyRequest().authenticated();
     }
 

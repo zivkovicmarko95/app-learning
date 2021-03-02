@@ -1,6 +1,7 @@
 package monitoringapi.filter;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -39,13 +41,6 @@ public class JwtHeaderFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String accessToken = request.getHeader(env.getProperty("server.credentials.header"));
-
-        // Checking access token
-        if (accessToken == null || !accessToken.equals(env.getProperty("server.credentials.token"))) {
-            filterChain.doFilter(request, response);
-            return;
-        }
 
         // Checking jwt token
         if (token == null || !token.startsWith(env.getProperty("jwt.token.header"))) {
@@ -58,8 +53,9 @@ public class JwtHeaderFilter extends OncePerRequestFilter {
             if (jwtHelper.isJwtTokenValid(token)) {
                 // final JwtSubject subject = jwtHelper.getSubject(token);
                 final String username = jwtHelper.getSubject(token);
+                final List<GrantedAuthority> authorities = jwtHelper.getAuthorities(token);
 
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, null, null);
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, null, authorities);
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }

@@ -38,6 +38,7 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
             .and()
             .addFilterAfter(jwtHeaderFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests().antMatchers(publicUrls).permitAll()
+            .antMatchers("/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
             .anyRequest().authenticated();
     }
 
