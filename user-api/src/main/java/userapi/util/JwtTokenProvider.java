@@ -23,10 +23,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 
+import userapi.constants.Authority;
 import userapi.models.UserPrincipal;
 
 @Component
 public class JwtTokenProvider {
+    
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
+    private static final String ROLE_SUPER_ADMIN = "ROLE_SUPER_ADMIN";
     
     private final Environment env;
 
@@ -42,6 +46,13 @@ public class JwtTokenProvider {
     public String generateJwtToken(UserPrincipal userPrincipal) {
         final String[] authorities = getAuthoritiesForUser(userPrincipal);
         final long expirationTime = Long.parseLong(env.getProperty("jwt.token.expirationTime"));
+        String[] permissions = Authority.USER_AUTHORITIES;
+
+        if (authorities[0].equals(ROLE_ADMIN)) {
+            permissions = Authority.ADMIN_AUTHORITIES;
+        } else if (authorities[0].equals(ROLE_SUPER_ADMIN)) {
+            permissions = Authority.SUPER_ADMIN_AUTHORITIES;
+        }
         
         return JWT.create()
             .withIssuedAt(new Date())
@@ -50,6 +61,7 @@ public class JwtTokenProvider {
             .withClaim("email", userPrincipal.getUser().getEmail())
             .withClaim("application", "app-learning")
             .withArrayClaim(env.getProperty("jwt.token.authorities"), authorities)
+            .withArrayClaim("permissions", permissions)
             .withExpiresAt(new Date( System.currentTimeMillis() + expirationTime ))
             .sign(Algorithm.HMAC512(env.getProperty("jwt.token.secret")));
     }
