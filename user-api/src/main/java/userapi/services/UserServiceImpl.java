@@ -35,23 +35,26 @@ import userapi.repositories.UserRepository;
 public class UserServiceImpl implements UserService, UserDetailsService {
 
     /*
-        UserService which is used for handling user actions like login,
-        finding user by id, finding all the users, saving user to the database,
-        deleting user by id, deleting all the users, registering user, finding user by username and
-        finding user by email, updating user and reseting user's password
-    */
+     * UserService which is used for handling user actions like login, finding user
+     * by id, finding all the users, saving user to the database, deleting user by
+     * id, deleting all the users, registering user, finding user by username and
+     * finding user by email, updating user and reseting user's password
+     */
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final MonitoringService monitoringService;
-    
+    private final LoginAttemptService loginAttemptService;
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, MonitoringService monitoringService) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
+            MonitoringService monitoringService, LoginAttemptService loginAttemptService) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.monitoringService = monitoringService;
+        this.loginAttemptService = loginAttemptService;
     }
 
     @Override
@@ -62,6 +65,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             logger.error(MessagesConstants.NO_USER_FOUND_BY_USERNAME + username);
             throw new UsernameNotFoundException(MessagesConstants.NO_USER_FOUND_BY_USERNAME + username);
         } else {
+            validateLoginAttempt(user);
             UserPrincipal userPrincipal = new UserPrincipal(user);
 
             logger.info(MessagesConstants.RETURNING_FOUND_USER_BY_USERNAME + username);
@@ -113,7 +117,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User register(String firstName, String lastName, String username, String email, String password) throws UserNotFoundException, UsernameExistException, EmailExistException {
+    public User register(String firstName, String lastName, String username, String email, String password)
+            throws UserNotFoundException, UsernameExistException, EmailExistException {
         validateNewUsernameAndEmail(StringUtils.EMPTY, username, email);
 
         User user = new User();
@@ -146,7 +151,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername,
-            String newEmail, boolean isNotLocked, boolean isActive) throws UserNotFoundException, UsernameExistException, EmailExistException {
+            String newEmail, boolean isNotLocked, boolean isActive)
+            throws UserNotFoundException, UsernameExistException, EmailExistException {
         User user = validateNewUsernameAndEmail(currentUsername, newUsername, newEmail);
 
         user.setFirstName(newFirstName);
@@ -164,9 +170,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User resetPassword(String email, String newPassword) throws EmailNotFoundException {
         sendMonitoringMessage(MessagesConstants.USER_RESTART_PASSWORD + email);
-        
+
         User user = findUserByEmail(email);
-        
+
         if (user == null) {
             throw new EmailNotFoundException(MessagesConstants.NO_USER_FOUND_BY_EMAIL + email);
         }
@@ -176,8 +182,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User savedUser = save(user);
         return savedUser;
     }
-    
-    private User validateNewUsernameAndEmail(String currentUsername, String newUsername, String email) throws UserNotFoundException, UsernameExistException, EmailExistException {
+
+    private User validateNewUsernameAndEmail(String currentUsername, String newUsername, String email)
+            throws UserNotFoundException, UsernameExistException, EmailExistException {
         User userByNewUsername = findUserByUsername(newUsername);
         User userByNewEmail = findUserByEmail(email);
 
@@ -219,6 +226,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return bCryptPasswordEncoder.encode(password);
     }
 
+    private void validateLoginAttempt(User user) {
+        if (user.getIsNotLocked()) {
+            if (loginAttemptService.hasExceededMaxAttempts(user.getUsername())) {
+                user.setIsNotLocked(false);
+                save(user);
+            } else {
+                user.setIsNotLocked(true);
+                save(user);
+            }
+        } else {
+            loginAttemptService.evictUserFromLoginAttemptCache(user.getUsername());
+        }
+    }
+
     private void sendMonitoringMessage(String message) {
         Monitoring monitoring = new Monitoring(message, MessagesConstants.USER_API);
 
@@ -226,4 +247,5 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         monitoringService.sendMessageToMonitoringApi(monitoring);
     }
+
 }
