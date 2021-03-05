@@ -96,7 +96,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers(@RequestBody HashMap<String, String> params) {
+    public ResponseEntity<List<User>> getAllUsers() {
         return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
     }
 
@@ -113,8 +113,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable String id, @RequestBody HashMap<String, String> params)
-            throws NotValidIdException {
+    public ResponseEntity<Void> deleteById(@PathVariable String id) throws NotValidIdException {
 
         userService.deleteById(id);
 
@@ -122,9 +121,9 @@ public class UserController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteAll(@RequestBody HashMap<String, String> params) {
+    public ResponseEntity<Void> deleteAll() {
         userService.deleteAll();
-        
+
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -139,8 +138,9 @@ public class UserController {
         return headers;
     }
 
-    private ResponseEntity<HttpResponse> response (HttpStatus httpStatus, String message) {
-        HttpResponse httpResponse = new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase(), message);
+    private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
+        HttpResponse httpResponse = new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase(),
+                message);
         return new ResponseEntity<>(httpResponse, httpStatus);
     }
 

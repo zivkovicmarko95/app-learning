@@ -27,8 +27,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     @Autowired
     private JwtHelper jwtHelper;
 
-    private String[] public_urls = { "/actuator/health", "/api/user/login", "/api/user/register", 
-                                        "/api/user/resetpassword", "/api/product/search", "/api/product/find" };
+    private String[] public_urls = { "/actuator/health", "/api/users/login", "/api/users/register", 
+                                        "/api/users/resetpassword", "/api/products/search", "/api/products" };
 
     @Override
     public GatewayFilter apply(Config config) {
