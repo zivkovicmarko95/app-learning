@@ -64,7 +64,7 @@ public class Bootstrap implements CommandLineRunner {
         orderRepository.save(order2).block();
         orderRepository.save(order3).block();
 
-        logger.info("Broj u bazi je:" + orderRepository.count().block());
+        logger.info("Number of elements in the database:" + orderRepository.count().block());
 
         logger.info("Added orders to the database");
 
