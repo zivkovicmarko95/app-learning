@@ -76,7 +76,7 @@ public class ProductServiceTest {
     private final double PRODUCT_PRICE = 10.0;
     private final int PRODUCT_QTY = 10;
 
-    private final String token = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwZXRhcnBldHJvdmljIiwiYXBwbGljYXRpb24iOiJhcHAtbGVhcm5pbmciLCJwZXJtaXNzaW9ucyI6WyJ1c2VyOnJlYWQiLCJ1c2VyOnVwZGF0ZSIsInVzZXI6Y3JlYXRlIiwidXNlcjpkZWxldGUiXSwiQXV0aG9yaXRpZXMiOlsiUk9MRV9TVVBFUl9BRE1JTiJdLCJpZCI6IjYwNDIwOGM1MWQ4NmQ4MTUwMTBhYTgxYiIsImV4cCI6MTYxNTM3MjgxMiwiaWF0IjoxNjE0OTQwODEyLCJlbWFpbCI6InBldGFyLnBldHJvdmljQGVtYWlsLmNvbSJ9._rL_O6HUVVpRXlUb6RT_olxS2ANg34aZzIYOb_XIunHpyJin065FEgJRRun10yEGT55rZbLYam5dlTLkunZBwQ";
+    private String token = "Bearer ";
 
     @BeforeEach
     public void setUp() {
@@ -189,7 +189,8 @@ public class ProductServiceTest {
     @Test
     public void checkIfAddProductWorks() throws NotValidOrderedProductList, UserIdNotExistException,
             NotValidProductIdException, ProductNotFoundException, NotValidProductQuantity {
-                
+
+        token += env.getProperty("jwt.token.testing");
         OrderedProduct validOrderedProduct = new OrderedProduct(productId, 1);
         List<OrderedProduct> validOrderedProductsList = new ArrayList<>();
         validOrderedProductsList.add(validOrderedProduct);
