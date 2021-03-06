@@ -92,7 +92,11 @@ public class ProductServiceImpl implements CategoryService, ProductService {
 
     @Override
     public Product saveProduct(Product product) {
-        Category category = findCategoryByName(product.getCategory().getName());
+        Category category = null;
+        if (product.getCategory() != null){
+            category = findCategoryByName(product.getCategory().getName());
+        }
+        
         Product saveProduct = null;
 
         if (category != null) {
@@ -121,7 +125,7 @@ public class ProductServiceImpl implements CategoryService, ProductService {
             Category savedCategory = saveCategory(newCategory);
 
             saveProduct.setCategory(savedCategory);
-            saveProduct = productRepository.save(product);
+            saveProduct = productRepository.save(saveProduct);
 
             sendMessageToMonitoring(ProductsConstants.PRODUCT_CREATED + saveProduct.toString());
 
@@ -201,6 +205,10 @@ public class ProductServiceImpl implements CategoryService, ProductService {
 
     @Override
     public Category findCategoryById(String id) throws CategoryNotFoundException {
+        if (id == null || !ObjectId.isValid(id)) {
+            throw new CategoryNotFoundException(ProductsConstants.CATEGORY_NOT_FOUND + id);
+        }
+        
         Optional<Category> optional = categoryRepository.findById(id);
 
         if (optional.isPresent()) {
