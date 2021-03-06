@@ -22,9 +22,9 @@ public class MonitoringServiceTest {
     private static final String TEST_PRODUCT_API = "test-product-api";
     private static final String TEST_ORDER_BACKUP_API = "test-order-backup-api";
     
-    private static final String MONITORING_MESSAGE1 = "JUnit user-api - monitoring1 object saved to the database";
-    private static final String MONITORING_MESSAGE2 = "JUnit product-api - monitoring2 object saved to the database";
-    private static final String MONITORING_MESSAGE3 = "JUnit order-backup-api - monitoring3 object saved to the database";
+    private static final String MONITORING_MESSAGE_USER_API = "JUnit user-api - monitoring1 object saved to the database";
+    private static final String MONITORING_MESSAGE_PRODUCT_API = "JUnit product-api - monitoring2 object saved to the database";
+    private static final String MONITORING_MESSAGE_ORDER_BACKUP_API = "JUnit order-backup-api - monitoring3 object saved to the database";
 
     @Autowired
     private MonitoringRepository monitoringRepository;
@@ -46,9 +46,9 @@ public class MonitoringServiceTest {
             monitoringService.deleteByApi(TEST_ORDER_BACKUP_API);
         }
 
-        Monitoring monitoring1 = new Monitoring(MONITORING_MESSAGE1, TEST_USER_API);
-        Monitoring monitoring2 = new Monitoring(MONITORING_MESSAGE2, TEST_PRODUCT_API);
-        Monitoring monitoring3 = new Monitoring(MONITORING_MESSAGE3, TEST_ORDER_BACKUP_API);
+        Monitoring monitoring1 = new Monitoring(MONITORING_MESSAGE_USER_API, TEST_USER_API);
+        Monitoring monitoring2 = new Monitoring(MONITORING_MESSAGE_PRODUCT_API, TEST_PRODUCT_API);
+        Monitoring monitoring3 = new Monitoring(MONITORING_MESSAGE_ORDER_BACKUP_API, TEST_ORDER_BACKUP_API);
 
         monitoringService.save(monitoring1);
         monitoringService.save(monitoring2);
@@ -61,13 +61,13 @@ public class MonitoringServiceTest {
         Monitoring testProductApiMonitoring = monitoringService.findByApi(TEST_PRODUCT_API).get(0);
         Monitoring testOrderBackupApiMonitoring = monitoringService.findByApi(TEST_ORDER_BACKUP_API).get(0);
 
-        assertEquals(MONITORING_MESSAGE1, testUserApiMonitoring.getMessage());
+        assertEquals(MONITORING_MESSAGE_USER_API, testUserApiMonitoring.getMessage());
         assertEquals(TEST_USER_API, testUserApiMonitoring.getApi());
 
-        assertEquals(MONITORING_MESSAGE2, testProductApiMonitoring.getMessage());
+        assertEquals(MONITORING_MESSAGE_PRODUCT_API, testProductApiMonitoring.getMessage());
         assertEquals(TEST_PRODUCT_API, testProductApiMonitoring.getApi());
 
-        assertEquals(MONITORING_MESSAGE3, testOrderBackupApiMonitoring.getMessage());
+        assertEquals(MONITORING_MESSAGE_ORDER_BACKUP_API, testOrderBackupApiMonitoring.getMessage());
         assertEquals(TEST_ORDER_BACKUP_API, testOrderBackupApiMonitoring.getApi());
 
         assertNotNull(testUserApiMonitoring.getId());
