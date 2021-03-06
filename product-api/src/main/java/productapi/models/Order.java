@@ -1,6 +1,7 @@
 package productapi.models;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -9,21 +10,23 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 public class Order {
-    
+
     /*
-        Order object reprsents order and it is created when user buy one or more
-        products. It has order id, userId and the products and quantities which are bought 
-        by the user
-    */
+     * Order object reprsents order and it is created when user buy one or more
+     * products. It has order id, userId and the products and quantities which are
+     * bought by the user
+     */
 
     @Id
     private String id;
     private String userId;
     private List<OrderedProduct> orderedProducts = new ArrayList<>();
+    private Date orderCreated;
 
     public Order(String userId, List<OrderedProduct> orderedProducts) {
         this.userId = userId;
         this.orderedProducts = orderedProducts;
+        this.orderCreated = new Date();
     }
 
     public String getId() {
@@ -50,6 +53,10 @@ public class Order {
         this.orderedProducts = orderedProducts;
     }
 
+    public Date getOrderCreated() {
+        return this.orderCreated;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == this)
@@ -58,12 +65,14 @@ public class Order {
             return false;
         }
         Order order = (Order) o;
-        return Objects.equals(id, order.id) && Objects.equals(userId, order.userId) && Objects.equals(orderedProducts, order.orderedProducts);
+        return Objects.equals(id, order.id) && Objects.equals(userId, order.userId)
+                && Objects.equals(orderedProducts, order.orderedProducts)
+                && Objects.equals(orderCreated, order.orderCreated);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userId, orderedProducts);
+        return Objects.hash(id, userId, orderedProducts, orderCreated);
     }
 
     @Override
@@ -72,6 +81,7 @@ public class Order {
             " id='" + getId() + "'" +
             ", userId='" + getUserId() + "'" +
             ", orderedProducts='" + getOrderedProducts() + "'" +
+            ", orderCreated='" + getOrderCreated() + "'" +
             "}";
     }
 
