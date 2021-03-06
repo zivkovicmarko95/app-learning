@@ -57,22 +57,22 @@ public class MonitoringServiceTest {
 
     @Test
     public void checkIfObjectIsSavedInDbTest() {
-        Monitoring testUserMonitoring = monitoringService.findByApi(TEST_USER_API).get(0);
-        Monitoring testProductMonitoring = monitoringService.findByApi(TEST_PRODUCT_API).get(0);
-        Monitoring testOrderBackupMonitoring = monitoringService.findByApi(TEST_ORDER_BACKUP_API).get(0);
+        Monitoring testUserApiMonitoring = monitoringService.findByApi(TEST_USER_API).get(0);
+        Monitoring testProductApiMonitoring = monitoringService.findByApi(TEST_PRODUCT_API).get(0);
+        Monitoring testOrderBackupApiMonitoring = monitoringService.findByApi(TEST_ORDER_BACKUP_API).get(0);
 
-        assertEquals(MONITORING_MESSAGE1, testUserMonitoring.getMessage());
-        assertEquals(TEST_USER_API, testUserMonitoring.getApi());
+        assertEquals(MONITORING_MESSAGE1, testUserApiMonitoring.getMessage());
+        assertEquals(TEST_USER_API, testUserApiMonitoring.getApi());
 
-        assertEquals(MONITORING_MESSAGE2, testProductMonitoring.getMessage());
-        assertEquals(TEST_PRODUCT_API, testProductMonitoring.getApi());
+        assertEquals(MONITORING_MESSAGE2, testProductApiMonitoring.getMessage());
+        assertEquals(TEST_PRODUCT_API, testProductApiMonitoring.getApi());
 
-        assertEquals(MONITORING_MESSAGE3, testOrderBackupMonitoring.getMessage());
-        assertEquals(TEST_ORDER_BACKUP_API, testOrderBackupMonitoring.getApi());
+        assertEquals(MONITORING_MESSAGE3, testOrderBackupApiMonitoring.getMessage());
+        assertEquals(TEST_ORDER_BACKUP_API, testOrderBackupApiMonitoring.getApi());
 
-        assertNotNull(testUserMonitoring.getId());
-        assertNotNull(testProductMonitoring.getId());
-        assertNotNull(testOrderBackupMonitoring.getId());
+        assertNotNull(testUserApiMonitoring.getId());
+        assertNotNull(testProductApiMonitoring.getId());
+        assertNotNull(testOrderBackupApiMonitoring.getId());
     }
 
     @Test
