@@ -10,9 +10,13 @@ public interface MonitoringService {
     
     List<Monitoring> findAll();
     
+    List<Monitoring> findByApi(String api);
+    
     Monitoring save(Monitoring object);
     
     void deleteById(String id);
+
+    void deleteByApi(String api);
     
     void deleteAll();
 

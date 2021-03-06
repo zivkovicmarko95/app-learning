@@ -5,6 +5,7 @@ import java.util.Date;
 public class MonitoringMessage {
 
     public final static String DELETING_LOG_BY_ID = "Deleting log by id: ";
+    public final static String DELETING_LOG_BY_API = "Deleting log by api: ";
     public final static String DELETING_LOG_DATABASE = "Deleting logs database, database name is: ";
 
     public final static String MONITORING_API = "monitoring-api";

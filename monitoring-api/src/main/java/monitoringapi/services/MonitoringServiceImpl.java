@@ -19,11 +19,11 @@ public class MonitoringServiceImpl implements MonitoringService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final MonitoringRepository userMonitoringRepository;
+    private final MonitoringRepository monitoringRepository;
 
     @Autowired
-    public MonitoringServiceImpl(MonitoringRepository userMonitoringRepository) {
-        this.userMonitoringRepository = userMonitoringRepository;
+    public MonitoringServiceImpl(MonitoringRepository monitoringRepository) {
+        this.monitoringRepository = monitoringRepository;
     }
 
     /*
@@ -32,7 +32,7 @@ public class MonitoringServiceImpl implements MonitoringService {
      */
     @Override
     public Monitoring findById(String id) {
-        Optional<Monitoring> optional = userMonitoringRepository.findById(id);
+        Optional<Monitoring> optional = monitoringRepository.findById(id);
 
         if (optional.isPresent()) {
             return optional.get();
@@ -47,7 +47,16 @@ public class MonitoringServiceImpl implements MonitoringService {
      */
     @Override
     public List<Monitoring> findAll() {
-        return userMonitoringRepository.findAll();
+        return monitoringRepository.findAll();
+    }
+
+    /**
+     * Method findByApi returns list of Monitoring objects which are searched by
+     * parameter api
+     */
+    @Override
+    public List<Monitoring> findByApi(String api) {
+        return monitoringRepository.findByApi(api);
     }
 
     /*
@@ -55,7 +64,8 @@ public class MonitoringServiceImpl implements MonitoringService {
      */
     @Override
     public Monitoring save(Monitoring object) {
-        return userMonitoringRepository.save(object);
+        Monitoring savedMonitoring = monitoringRepository.save(object);
+        return savedMonitoring;
     }
 
     /*
@@ -66,7 +76,16 @@ public class MonitoringServiceImpl implements MonitoringService {
     @Override
     public void deleteById(String id) {
         logger.warn(MonitoringMessage.DELETING_LOG_BY_ID + id);
-        userMonitoringRepository.deleteById(id);
+        monitoringRepository.deleteById(id);
+    }
+
+    /**
+     * Method deleteByApi is used for deleting Monitoring objects with same api parameter
+     */
+    @Override
+    public void deleteByApi(String api) {
+        logger.warn(MonitoringMessage.DELETING_LOG_BY_API + api);
+        monitoringRepository.deleteByApi(api);
     }
 
     /*
@@ -75,7 +94,7 @@ public class MonitoringServiceImpl implements MonitoringService {
     @Override
     public void deleteAll() {
         logger.warn(MonitoringMessage.DELETING_LOG_DATABASE);
-        userMonitoringRepository.deleteAll();
+        monitoringRepository.deleteAll();
     }
 
     /*
@@ -94,7 +113,7 @@ public class MonitoringServiceImpl implements MonitoringService {
             logger.warn(message);
         }
 
-        userMonitoringRepository.save(monitoring);
+        monitoringRepository.save(monitoring);
     }
 
 }

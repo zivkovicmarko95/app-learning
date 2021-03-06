@@ -51,6 +51,13 @@ public class MonitoringController {
         return new ResponseEntity<>(userMonitoringService.findById(id), HttpStatus.OK);
     }
 
+    @GetMapping("/search/{api}")
+    public ResponseEntity<List<Monitoring>> fetchMonitoringByApi(@PathVariable String api) {
+        logger.info(MonitoringMessage.USER_FETCHED_USER_MONITORING_DATA + api);
+
+        return new ResponseEntity<>(userMonitoringService.findByApi(api), HttpStatus.OK);
+    }
+
     @GetMapping
     public ResponseEntity<List<Monitoring>> fetchAllMonitoringLogs() {
         logger.info(MonitoringMessage.USER_FETCH_ALL_THE_DATA);
