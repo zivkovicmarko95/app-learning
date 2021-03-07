@@ -118,7 +118,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    public void checkIfObjectIsSavedInDb()
+    public void testSavingProductAndCategory()
             throws NotValidProductIdException, ProductNotFoundException, CategoryNotFoundException {
         Product product = productService.findProductById(productId);
 
@@ -132,7 +132,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    public void checkIfProductIsDeletedFromDb()
+    public void testDeleteProductById()
             throws NotValidProductIdException, ProductNotFoundException, CategoryNotFoundException {
 
         Product product = productService.findProductById(productId);
@@ -146,7 +146,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    public void checkIfCategoryIsDeletedFromDb()
+    public void testDeleteCategoryById()
             throws NotValidProductIdException, ProductNotFoundException, CategoryNotFoundException {
         Product product = productService.findProductById(productId);
 
@@ -158,7 +158,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    public void checkIfSearchWorks() throws NotValidProductIdException, ProductNotFoundException {
+    public void testSearch() throws NotValidProductIdException, ProductNotFoundException {
         String testProductId = new ObjectId().toString();
         assertThrows(ProductNotFoundException.class, () -> productService.search(testProductId));
 
@@ -187,7 +187,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    public void checkIfAddProductWorks() throws NotValidOrderedProductList, UserIdNotExistException,
+    public void testAddProducts() throws NotValidOrderedProductList, UserIdNotExistException,
             NotValidProductIdException, ProductNotFoundException, NotValidProductQuantity {
 
         token += env.getProperty("jwt.token.testing");
