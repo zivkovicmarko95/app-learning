@@ -24,3 +24,6 @@ hs_err_pid*
 
 spring-cloud-consul/consul.exe
 spring-cloud-consul/consol-data
+spring-cloud-consul/consul-data
+
+notification-api

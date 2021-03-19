@@ -1,19 +1,20 @@
 package monitoringapi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import monitoringapi.models.Monitoring;
 import monitoringapi.repositories.MonitoringRepository;
 import monitoringapi.services.MonitoringServiceImpl;
-
 
 @DataMongoTest
 public class MonitoringServiceTest {
@@ -26,39 +27,28 @@ public class MonitoringServiceTest {
     private static final String MONITORING_MESSAGE_PRODUCT_API = "JUnit product-api - monitoring2 object saved to the database";
     private static final String MONITORING_MESSAGE_ORDER_BACKUP_API = "JUnit order-backup-api - monitoring3 object saved to the database";
 
-    @Autowired
+    @MockBean
     private MonitoringRepository monitoringRepository;
     private MonitoringServiceImpl monitoringService;
 
     @BeforeEach
     public void setUp() {
         monitoringService = new MonitoringServiceImpl(monitoringRepository);
-
-        if (monitoringService.findByApi(TEST_USER_API).size() > 0) {
-            monitoringService.deleteByApi(TEST_USER_API);
-        }
-
-        if (monitoringService.findByApi(TEST_PRODUCT_API).size() > 0) {
-            monitoringService.deleteByApi(TEST_PRODUCT_API);
-        }
-
-        if (monitoringService.findByApi(TEST_ORDER_BACKUP_API).size() > 0) {
-            monitoringService.deleteByApi(TEST_ORDER_BACKUP_API);
-        }
-
-        Monitoring monitoring1 = new Monitoring(MONITORING_MESSAGE_USER_API, TEST_USER_API);
-        Monitoring monitoring2 = new Monitoring(MONITORING_MESSAGE_PRODUCT_API, TEST_PRODUCT_API);
-        Monitoring monitoring3 = new Monitoring(MONITORING_MESSAGE_ORDER_BACKUP_API, TEST_ORDER_BACKUP_API);
-
-        monitoringService.save(monitoring1);
-        monitoringService.save(monitoring2);
-        monitoringService.save(monitoring3); 
     }
 
     @Test
     public void checkIfObjectIsSavedInDbTest() {
+        Monitoring monitoring1 = new Monitoring(MONITORING_MESSAGE_USER_API, TEST_USER_API);
+        Monitoring monitoring2 = new Monitoring(MONITORING_MESSAGE_PRODUCT_API, TEST_PRODUCT_API);
+        Monitoring monitoring3 = new Monitoring(MONITORING_MESSAGE_ORDER_BACKUP_API, TEST_ORDER_BACKUP_API);
+        
+        when(monitoringService.findByApi(TEST_USER_API)).thenReturn(List.of(monitoring1));
         Monitoring testUserApiMonitoring = monitoringService.findByApi(TEST_USER_API).get(0);
+
+        when(monitoringService.findByApi(TEST_PRODUCT_API)).thenReturn(List.of(monitoring2));
         Monitoring testProductApiMonitoring = monitoringService.findByApi(TEST_PRODUCT_API).get(0);
+
+        when(monitoringService.findByApi(TEST_ORDER_BACKUP_API)).thenReturn(List.of(monitoring3));
         Monitoring testOrderBackupApiMonitoring = monitoringService.findByApi(TEST_ORDER_BACKUP_API).get(0);
 
         assertEquals(MONITORING_MESSAGE_USER_API, testUserApiMonitoring.getMessage());
@@ -69,31 +59,28 @@ public class MonitoringServiceTest {
 
         assertEquals(MONITORING_MESSAGE_ORDER_BACKUP_API, testOrderBackupApiMonitoring.getMessage());
         assertEquals(TEST_ORDER_BACKUP_API, testOrderBackupApiMonitoring.getApi());
-
-        assertNotNull(testUserApiMonitoring.getId());
-        assertNotNull(testProductApiMonitoring.getId());
-        assertNotNull(testOrderBackupApiMonitoring.getId());
     }
 
     @Test
     public void checkIfObjectIsDeletedFromDb() {
-        monitoringService.deleteByApi(TEST_USER_API);
-        monitoringService.deleteByApi(TEST_PRODUCT_API);
-        monitoringService.deleteByApi(TEST_ORDER_BACKUP_API);
+        Monitoring monitoring1 = new Monitoring(MONITORING_MESSAGE_USER_API, TEST_USER_API);
 
-        assertTrue(monitoringService.findByApi(TEST_USER_API).isEmpty());
-        assertTrue(monitoringService.findByApi(TEST_PRODUCT_API).isEmpty());
-        assertTrue(monitoringService.findByApi(TEST_ORDER_BACKUP_API).isEmpty());
+        when(monitoringService.findByApi(TEST_USER_API)).thenReturn(List.of(monitoring1));
+        Monitoring testUserApiMonitoring = monitoringService.findByApi(TEST_USER_API).get(0);
+
+        monitoringService.deleteByApi(testUserApiMonitoring.getApi());
+
+        verify(monitoringRepository).deleteByApi(testUserApiMonitoring.getApi());
     }
 
     @Test
     public void checkIfObjectIsDeletedByIdFromDb() {
-        Monitoring monitoring = monitoringService.findAll().get(0);
-        String id = monitoring.getId();
+        Monitoring monitoring1 = new Monitoring(MONITORING_MESSAGE_USER_API, TEST_USER_API);
+        monitoring1.setId(UUID.randomUUID().toString());
 
-        monitoringService.deleteById(id);
+        monitoringService.deleteById(monitoring1.getId());
 
-        assertNull(monitoringService.findById(id));
+        verify(monitoringRepository).deleteById(monitoring1.getId());
     }
 
 }
