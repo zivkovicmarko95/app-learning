@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import monitoringapi.models.Monitoring;
-import monitoringapi.repositories.MonitoringRepository;
-import monitoringapi.services.MonitoringServiceImpl;
+import com.example.monitoringapi.models.Monitoring;
+import com.example.monitoringapi.repositories.MonitoringRepository;
+import com.example.monitoringapi.services.MonitoringServiceImpl;
 
 @DataMongoTest
 public class MonitoringServiceTest {
