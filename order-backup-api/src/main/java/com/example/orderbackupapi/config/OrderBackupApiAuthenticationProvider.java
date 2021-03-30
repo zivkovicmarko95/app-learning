@@ -1,4 +1,6 @@
-package com.example.productapi.config;
+package com.example.orderbackupapi.config;
+
+import javax.management.RuntimeErrorException;
 
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,19 +14,19 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProductApiAuthenticationProvider implements AuthenticationProvider {
+public class OrderBackupApiAuthenticationProvider implements AuthenticationProvider {
 
     private final MongoTemplate mongoTemplate;
 
     @Autowired
-    public ProductApiAuthenticationProvider(MongoTemplate mongoTemplate) {
+    public OrderBackupApiAuthenticationProvider(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
     }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String name = authentication.getName();
-        String password = authentication.getCredentials().toString();
+        String password = authentication.getPrincipal().toString();
 
         Criteria criteria = new Criteria();
         criteria.where("username").is(name);
@@ -35,7 +37,7 @@ public class ProductApiAuthenticationProvider implements AuthenticationProvider 
 
         if (user == null) {
             throw new RuntimeException(
-                String.format("User with provided username {} does not exist", name)
+                String.format("User with provided username {} does not exist", name);
             );
         }
 
@@ -46,5 +48,5 @@ public class ProductApiAuthenticationProvider implements AuthenticationProvider 
     public boolean supports(Class<?> authentication) {
         return (UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication));
     }
-
+    
 }

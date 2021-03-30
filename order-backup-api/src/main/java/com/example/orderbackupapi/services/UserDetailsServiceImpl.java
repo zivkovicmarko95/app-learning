@@ -1,10 +1,10 @@
-package com.example.productapi.services;
+package com.example.orderbackupapi.services;
 
 import org.bson.Document;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,10 +16,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     private MongoTemplate mongoTemplate;
-
+    
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        
         Criteria criteria = new Criteria();
         criteria.where("username").is(username);
 
@@ -28,7 +27,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Document user = mongoTemplate.findOne(query, Document.class, "user");
 
         if (user == null) {
-            throw new UsernameNotFoundException("User does not exist");
+            throw new BadCredentialsException(
+                String.format("User with provided username {} does not exist!", username)
+            );
         }
         
         return User.withUsername(username)
@@ -36,5 +37,5 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                     .roles(user.getString("role"))
                     .build();
     }
-
+    
 }
