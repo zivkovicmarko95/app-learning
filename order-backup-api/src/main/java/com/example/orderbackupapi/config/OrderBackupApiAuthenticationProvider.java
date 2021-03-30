@@ -37,7 +37,7 @@ public class OrderBackupApiAuthenticationProvider implements AuthenticationProvi
 
         if (user == null) {
             throw new RuntimeException(
-                String.format("User with provided username {} does not exist", name);
+                String.format("User with provided username {} does not exist", name)
             );
         }
 
