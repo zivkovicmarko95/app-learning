@@ -1,4 +1,4 @@
-package com.example.productapi.services;
+package com.example.monitoringapi.services;
 
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        
         Criteria criteria = new Criteria();
         criteria.where("username").is(username);
 
@@ -38,5 +37,5 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                     .roles(user.getString("role"))
                     .build();
     }
-
+    
 }

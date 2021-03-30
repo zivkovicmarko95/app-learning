@@ -1,4 +1,4 @@
-package com.example.orderbackupapi.config;
+package com.example.monitoringapi.configs;
 
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,19 +12,15 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OrderBackupApiAuthenticationProvider implements AuthenticationProvider {
-
-    private final MongoTemplate mongoTemplate;
+public class MonitoringApiAuthenticationProvider implements AuthenticationProvider {
 
     @Autowired
-    public OrderBackupApiAuthenticationProvider(MongoTemplate mongoTemplate) {
-        this.mongoTemplate = mongoTemplate;
-    }
+    private MongoTemplate mongoTemplate;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String name = authentication.getName();
-        String password = authentication.getPrincipal().toString();
+        String password = authentication.getCredentials().toString();
 
         Criteria criteria = new Criteria();
         criteria.where("username").is(name);
