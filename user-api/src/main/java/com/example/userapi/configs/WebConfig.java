@@ -36,22 +36,27 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserDetailsService userDetailsService;
+    private final UserApiAuthenticationProvider userApiAuthenticationProvider;
 
     private final String[] public_urls = { "/actuator/health", "/api/users/login", "/api/users/register", "/api/users/resetpassword/**" };
 
     @Autowired
     public WebConfig(JwtAuthorizationFilter jwtAuthorizationFilter, JwtAccessDeniedHandler jwtAccessDeniedHandler, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, 
-                BCryptPasswordEncoder bCryptPasswordEncoder, @Qualifier("userDetailsService") UserDetailsService userDetailsService) {
+                BCryptPasswordEncoder bCryptPasswordEncoder, @Qualifier("userDetailsService") UserDetailsService userDetailsService,
+                UserApiAuthenticationProvider userApiAuthenticationProvider) {
         this.jwtAuthorizationFilter = jwtAuthorizationFilter;
         this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userDetailsService = userDetailsService;
+        this.userApiAuthenticationProvider = userApiAuthenticationProvider;
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
+        auth.authenticationProvider(userApiAuthenticationProvider)
+            .userDetailsService(userDetailsService)
+            .passwordEncoder(bCryptPasswordEncoder);
     }
 
     @Override

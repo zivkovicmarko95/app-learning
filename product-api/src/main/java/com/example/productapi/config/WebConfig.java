@@ -41,7 +41,8 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(productApiAuthenticationProvider)
-            .userDetailsService(userDetailsService);
+            .userDetailsService(userDetailsService)
+            .passwordEncoder(bCryptPasswordEncoder());
     }
 
     @Override
@@ -65,6 +66,11 @@ public class WebConfig extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
 }
