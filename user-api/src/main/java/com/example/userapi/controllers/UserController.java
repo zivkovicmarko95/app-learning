@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.userapi.businessservices.UserBusinessService;
 import com.example.userapi.constants.MessagesConstants;
 import com.example.userapi.dtos.UpdateUserDTO;
 import com.example.userapi.dtos.UserDTO;
@@ -29,7 +30,6 @@ import com.example.userapi.exceptions.UsernameExistException;
 import com.example.userapi.models.HttpResponse;
 import com.example.userapi.models.User;
 import com.example.userapi.models.UserPrincipal;
-import com.example.userapi.services.UserService;
 import com.example.userapi.util.JwtTokenProvider;
 import com.example.userapi.util.Mapper;
 
@@ -48,16 +48,16 @@ public class UserController {
 
     public static final String BASE_URL = "/api/users";
 
-    private final UserService userService;
+    private final UserBusinessService userBusinessService;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final Mapper mapper;
     private final Environment env;
 
     @Autowired
-    public UserController(UserService userService, AuthenticationManager authenticationManager,
+    public UserController(UserBusinessService userBusinessService, AuthenticationManager authenticationManager,
             JwtTokenProvider jwtTokenProvider, Mapper mapper, Environment env) {
-        this.userService = userService;
+        this.userBusinessService = userBusinessService;
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.mapper = mapper;
@@ -67,7 +67,7 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<UserDTO> register(@RequestBody User user)
             throws UserNotFoundException, UsernameExistException, EmailExistException {
-        User newUser = userService.register(user.getFirstName(), user.getLastName(), user.getUsername(),
+        User newUser = userBusinessService.register(user.getFirstName(), user.getLastName(), user.getUsername(),
                 user.getEmail(), user.getPassword());
 
         return new ResponseEntity<>(mapper.convertUserToUserDTO(newUser), HttpStatus.CREATED);
@@ -77,7 +77,7 @@ public class UserController {
     public ResponseEntity<UserDTO> login(@RequestBody User user) {
         authenticate(user.getUsername(), user.getPassword());
 
-        User loginUser = userService.findUserByUsername(user.getUsername());
+        User loginUser = userBusinessService.findUserByUsername(user.getUsername());
         UserPrincipal userPrincipal = new UserPrincipal(loginUser);
         HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
 
@@ -89,7 +89,7 @@ public class UserController {
             throws UserNotFoundException, UsernameExistException, EmailExistException {
         Boolean active = Boolean.parseBoolean(userDTO.getIsActive());
         Boolean notLocked = Boolean.parseBoolean(userDTO.getIsNotLocked());
-        User updateUser = userService.updateUser(userDTO.getCurrentUsername(), userDTO.getFirstName(),
+        User updateUser = userBusinessService.updateUser(userDTO.getCurrentUsername(), userDTO.getFirstName(),
                 userDTO.getLastName(), userDTO.getUsername(), userDTO.getEmail(), notLocked, active);
 
         return new ResponseEntity<>(mapper.convertUserToUserDTO(updateUser), HttpStatus.OK);
@@ -97,32 +97,32 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
-        return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
+        return new ResponseEntity<>(userBusinessService.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<User> findUserById(@PathVariable String id) throws NotValidIdException {
-        return new ResponseEntity<>(userService.findById(id), HttpStatus.OK);
+        return new ResponseEntity<>(userBusinessService.findById(id), HttpStatus.OK);
     }
 
     @PostMapping("/resetPassword")
     public ResponseEntity<HttpResponse> resetPassword(@RequestBody HashMap<String, String> params)
             throws EmailNotFoundException {
-        userService.resetPassword(params.get("email"), params.get("newPassword"));
+        userBusinessService.resetPassword(params.get("email"), params.get("newPassword"));
         return response(HttpStatus.OK, MessagesConstants.EMAIL_SENT + params.get("email"));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable String id) throws NotValidIdException {
 
-        userService.deleteById(id);
+        userBusinessService.deleteById(id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping
     public ResponseEntity<Void> deleteAll() {
-        userService.deleteAll();
+        userBusinessService.deleteAll();
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

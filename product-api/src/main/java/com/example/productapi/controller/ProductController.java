@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.productapi.businessservices.ProductBusinessService;
 import com.example.productapi.dto.ProductDTO;
 import com.example.productapi.exceptions.CategoryNotFoundException;
 import com.example.productapi.exceptions.NotValidOrderedProductList;
@@ -26,7 +27,6 @@ import com.example.productapi.models.Category;
 import com.example.productapi.models.Order;
 import com.example.productapi.models.OrderedProduct;
 import com.example.productapi.models.Product;
-import com.example.productapi.services.ProductServiceImpl;
 import com.example.productapi.util.Mapper;
 
 @RestController
@@ -43,25 +43,25 @@ public class ProductController {
 
     public static final String BASE_URL = "/api/products";
 
-    private final ProductServiceImpl productService;
+    private final ProductBusinessService productBusinessService;
     private final Mapper mapper;
 
     @Autowired
-    public ProductController(ProductServiceImpl productService, Mapper mapper) {
-        this.productService = productService;
+    public ProductController(ProductBusinessService productBusinessService, Mapper mapper) {
+        this.productBusinessService = productBusinessService;
         this.mapper = mapper;
     }
 
     @GetMapping
     public ResponseEntity<List<ProductDTO>> findAllProducts() {
-        List<Product> products = productService.findAllProducts();
+        List<Product> products = productBusinessService.findAllProducts();
         return new ResponseEntity<>(mapper.convertProductToProductDTO(products), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductDTO> findProductById(@PathVariable String id)
             throws NotValidProductIdException, ProductNotFoundException {
-        Product product = productService.findProductById(id);
+        Product product = productBusinessService.findProductById(id);
 
         return new ResponseEntity<>(mapper.convertProductToProductDTO(product), HttpStatus.OK);
     }
@@ -69,7 +69,7 @@ public class ProductController {
     @GetMapping("/search/{param}")
     public ResponseEntity<List<ProductDTO>> search(@PathVariable String param)
             throws NotValidProductIdException, ProductNotFoundException {
-        List<Product> foundProducts = productService.search(param);
+        List<Product> foundProducts = productBusinessService.search(param);
 
         if (foundProducts.size() == 0) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -82,7 +82,7 @@ public class ProductController {
     public ResponseEntity<Product> createProduct(@RequestBody ProductDTO productDTO) {
         if (productDTO.getCategory().getName() != null) {
             Product product = mapper.convertDtoToProduct(productDTO);
-            Product saveProduct = productService.saveProduct(product);
+            Product saveProduct = productBusinessService.saveProduct(product);
 
             return new ResponseEntity<>(saveProduct, HttpStatus.OK);
         } else {
@@ -93,41 +93,41 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProductById(@PathVariable String id)
             throws NotValidProductIdException, ProductNotFoundException {
-        productService.deleteProductById(id);
+        productBusinessService.deleteProductById(id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping
     public ResponseEntity<Void> deleteAllProducts() {
-        productService.deleteAllProducts();
+        productBusinessService.deleteAllProducts();
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/categories")
     public ResponseEntity<List<Category>> findAllCategories() {
-        List<Category> categories = productService.findAllCategories();
+        List<Category> categories = productBusinessService.findAllCategories();
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
     @GetMapping("/categories/{id}")
     public ResponseEntity<Category> findCategoryById(@PathVariable String id) throws CategoryNotFoundException {
-        Category category = productService.findCategoryById(id);
+        Category category = productBusinessService.findCategoryById(id);
         return new ResponseEntity<>(category, HttpStatus.OK);
     }
 
     @DeleteMapping("/categories/{id}")
     public ResponseEntity<Void> deleteCategoryById(@PathVariable String id)
             throws NotValidProductIdException, ProductNotFoundException, CategoryNotFoundException {
-        productService.deleteCategoryById(id);
+        productBusinessService.deleteCategoryById(id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/categories")
     public ResponseEntity<Void> deleteAllCategories() {
-        productService.deleteAllCategories();
+        productBusinessService.deleteAllCategories();
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -137,7 +137,7 @@ public class ProductController {
             @RequestBody List<OrderedProduct> orderedProducts) throws NotValidOrderedProductList,
             UserIdNotExistException, NotValidProductIdException, ProductNotFoundException, NotValidProductQuantity {
         String token = params.get("authorization");
-        Order order = productService.addProduct(orderedProducts, token);
+        Order order = productBusinessService.addProduct(orderedProducts, token);
         return new ResponseEntity<>(order, HttpStatus.OK);
     }
 

@@ -20,10 +20,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         
-        Criteria criteria = new Criteria();
-        criteria.where("username").is(username);
-
-        Query query = new Query(criteria);
+        Query query = new Query(Criteria.where("username").is(username));
 
         Document user = mongoTemplate.findOne(query, Document.class, "user");
 
